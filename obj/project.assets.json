@@ -1431,11 +1431,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Gabriel\\Documents\\Work Misc\\FileWatcher\\FileWatcher.csproj",
+      "projectUniqueName": "C:\\Users\\Gabriel\\Documents\\Work\\FileWatcher\\File-Watcher\\FileWatcher.csproj",
       "projectName": "FileWatcher",
-      "projectPath": "C:\\Users\\Gabriel\\Documents\\Work Misc\\FileWatcher\\FileWatcher.csproj",
+      "projectPath": "C:\\Users\\Gabriel\\Documents\\Work\\FileWatcher\\File-Watcher\\FileWatcher.csproj",
       "packagesPath": "C:\\Users\\Gabriel\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Gabriel\\Documents\\Work Misc\\FileWatcher\\obj\\",
+      "outputPath": "C:\\Users\\Gabriel\\Documents\\Work\\FileWatcher\\File-Watcher\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "fZMenzYjVnsv0Nef3xMEg6Q2oGzYYJebkWNo/gBlCSGJpPf9wpuy6hhklGJUkR+8Czlkb1tH9CDmte811A4qZw==",
+  "dgSpecHash": "co2fUjpje3KH52vF+XEvWqsNaiINC6vUNBNDQMz9d05BYYbFyq9dTYgGFefsBfNfafpGsqHwAZdhWiG94beUig==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Gabriel\\Documents\\Work Misc\\FileWatcher\\FileWatcher.csproj",
+  "projectFilePath": "C:\\Users\\Gabriel\\Documents\\Work\\FileWatcher\\File-Watcher\\FileWatcher.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Gabriel\\.nuget\\packages\\microsoft.extensions.configuration\\7.0.0\\microsoft.extensions.configuration.7.0.0.nupkg.sha512",
     "C:\\Users\\Gabriel\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\7.0.0\\microsoft.extensions.configuration.abstractions.7.0.0.nupkg.sha512",
