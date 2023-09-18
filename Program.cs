@@ -25,9 +25,14 @@ namespace FileWatcher
             string destinationPath = Console.ReadLine();
             configuration["DestinationPath"] = destinationPath;
             */
-            Console.Write("Enter delay1 in milliseconds: ");
+            Console.Write("Enter copy delay in milliseconds: ");
             string delay1 = Console.ReadLine();
             configuration["Delay1"] = delay1;
+
+            Console.Write("Enter delete after move delay in milliseconds: ");
+            string delay2 = Console.ReadLine();
+            configuration["Delay2"] = delay2;
+
 
             CreateHostBuilder(args, configuration).Build().Run();
         }
