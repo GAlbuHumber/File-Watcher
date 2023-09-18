@@ -74,26 +74,41 @@ namespace FileWatcherWorkerService
             }
 
         }
-        private string GetDailyDestinationFolder()
+       
+            private string GetDailyDestinationFolder()
         {
             DateTime now = DateTime.Now;
-            string parentDir = Directory.GetParent(_configuration["sourcepath"]).FullName;
-            string dailyFolderName = $"Backup_{now:yyyy-MM-dd}";
-            return Path.Combine(parentDir, dailyFolderName);
+            string sourceParentDir = Directory.GetParent(_configuration["sourcepath"]).FullName;
+            string dailyFolderName;
+
+            // If it's past 12 PM, use a folder name with a timestamp
+            if (now.TimeOfDay > new TimeSpan(12, 0, 0))
+            {
+                dailyFolderName = $"Backup_{now:yyyy-MM-dd_HH-mm-ss}";
+            }
+            else
+            {
+                // Use a folder name with today's date only
+                dailyFolderName = $"Default_Backup_{now:yyyy-MM-dd}";
+            }
+
+            return Path.Combine(sourceParentDir, dailyFolderName);
         }
+
         private void OnCreate(object source, FileSystemEventArgs e)
         {
             int n = 1;
             DateTime now = DateTime.Now;
-            String crtFileName = e.Name;
+            string crtFileName = e.Name;
 
             string sourceFile = Path.Combine(_configuration["sourcepath"], crtFileName);
 
             string dailyDestinationFolder = GetDailyDestinationFolder();
-            if (now.TimeOfDay > new TimeSpan(12, 1, 0) && !Directory.Exists(dailyDestinationFolder))
+            if (!Directory.Exists(dailyDestinationFolder))
             {
                 Directory.CreateDirectory(dailyDestinationFolder);
             }
+
             string destinationFile = Path.Combine(dailyDestinationFolder, crtFileName);
             int idx = destinationFile.LastIndexOf('.');
             string partDest = idx != -1 ? destinationFile.Substring(0, idx) : destinationFile;
@@ -169,6 +184,7 @@ namespace FileWatcherWorkerService
                 writer.WriteLine(e.OldFullPath + " renamed to " + e.FullPath);
             }
         }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _watcher.EnableRaisingEvents = true;
