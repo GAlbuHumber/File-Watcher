@@ -94,7 +94,6 @@ namespace FileWatcherWorkerService
             {
                 Directory.CreateDirectory(dailyDestinationFolder);
             }
-
             string destinationFile = Path.Combine(dailyDestinationFolder, crtFileName);
             int idx = destinationFile.LastIndexOf('.');
             string partDest = idx != -1 ? destinationFile.Substring(0, idx) : destinationFile;
