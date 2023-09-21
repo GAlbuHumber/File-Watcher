@@ -29,7 +29,7 @@ namespace FileWatcher
             string delay1 = Console.ReadLine();
             configuration["Delay1"] = delay1;
 
-            Console.Write("Enter delete after move delay in milliseconds: ");
+            Console.Write("Enter time to delete file after move in minutes: ");
             string delay2 = Console.ReadLine();
             configuration["Delay2"] = delay2;
 

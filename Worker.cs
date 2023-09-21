@@ -51,49 +51,69 @@ namespace FileWatcherWorkerService
                 if (f.LastAccessTime < DateTime.Now.AddMinutes(int.Parse(_configuration["delay1"])))
                 {
                     f.Delete();
-
                 }
             }
-        }   
+        }
+
         private bool CheckFileHasCopied(string FilePath)
         {
             try
             {
-                if (File.Exists(FilePath)) 
+                if (File.Exists(FilePath))
+                {
                     using (File.OpenRead(FilePath))
                     {
                         return true;
                     }
+                }
                 else
+                {
                     return false;
+                }
             }
             catch (Exception)
             {
                 Thread.Sleep(100);
                 return CheckFileHasCopied(FilePath);
             }
-
         }
-       
-            private string GetDailyDestinationFolder()
+
+        private string GetDailyDestinationFolder()
         {
             DateTime now = DateTime.Now;
-            string sourceParentDir = Directory.GetParent(_configuration["sourcepath"]).FullName;
+            string sourcePath = _configuration["sourcepath"];
+
+            if (!Directory.Exists(sourcePath))
+            {
+                Directory.CreateDirectory(sourcePath);
+            }
+
+            string parentSourcePath = Directory.GetParent(sourcePath).FullName;
+
+            // Construct the backup folder name
             string dailyFolderName;
 
-            // If it's past 12 PM, use a folder name with a timestamp
             if (now.TimeOfDay > new TimeSpan(12, 0, 0))
             {
                 dailyFolderName = $"Backup_{now:yyyy-MM-dd_HH-mm-ss}";
             }
             else
             {
-                // Use a folder name with today's date only
                 dailyFolderName = $"Default_Backup_{now:yyyy-MM-dd}";
             }
 
-            return Path.Combine(sourceParentDir, dailyFolderName);
+            // Create a separate "logs" folder
+            string logsFolderPath = Path.Combine(parentSourcePath, "logs");
+            if (!Directory.Exists(logsFolderPath))
+            {
+                Directory.CreateDirectory(logsFolderPath);
+            }
+
+          
+            return Path.Combine(parentSourcePath, dailyFolderName);
         }
+
+
 
         private void OnCreate(object source, FileSystemEventArgs e)
         {
@@ -121,25 +141,25 @@ namespace FileWatcherWorkerService
                     if (!File.Exists(destinationFile))
                     {
                         File.Copy(sourceFile, destinationFile, true);
-                        LogFileAction($"{now.ToString("F")} file detected {crtFileName}");
-                        LogFileAction($"{now.ToString("F")} file {crtFileName} will be moved to {dailyDestinationFolder} after {int.Parse(_configuration["delay1"]) / 1000} s");
-                        LogFileAction($"{now.ToString("F")} file {crtFileName} has been moved to {dailyDestinationFolder} will be deleted after {int.Parse(_configuration["delay2"])} min");
+                        LogFileAction(dailyDestinationFolder, $"{now.ToString("F")} file detected {crtFileName}");
+                        LogFileAction(dailyDestinationFolder, $"{now.ToString("F")} file {crtFileName} will be moved to {dailyDestinationFolder} after {int.Parse(_configuration["delay1"]) / 1000} s");
+                        LogFileAction(dailyDestinationFolder, $"{now.ToString("F")} file {crtFileName} has been moved to {dailyDestinationFolder} will be deleted after {int.Parse(_configuration["delay2"])} min");
                     }
                     else
                     {
                         string copyDestination = !File.Exists(partDest + " - Copy." + ext)
-                                                ? partDest + " - Copy." + ext
-                                                : GetUniqueCopyDestination(partDest, ext, n);
+                            ? partDest + " - Copy." + ext
+                            : GetUniqueCopyDestination(partDest, ext, n);
 
                         File.Copy(sourceFile, copyDestination, true);
-                        LogFileAction($"{now.ToString("F")} file detected {crtFileName}");
-                        LogFileAction($"{now.ToString("F")} file {crtFileName} will be moved to {dailyDestinationFolder} after {int.Parse(_configuration["delay1"]) / 1000} s");
-                        LogFileAction($"{now.ToString("F")} file {crtFileName} has been moved to {copyDestination} will be deleted after {int.Parse(_configuration["delay2"])} min");
+                        LogFileAction(dailyDestinationFolder, $"{now.ToString("F")} file detected {crtFileName}");
+                        LogFileAction(dailyDestinationFolder, $"{now.ToString("F")} file {crtFileName} will be moved to {dailyDestinationFolder} after {int.Parse(_configuration["delay1"]) / 1000} s");
+                        LogFileAction(dailyDestinationFolder, $"{now.ToString("F")} file {crtFileName} has been moved to {copyDestination} will be deleted after {int.Parse(_configuration["delay2"])} min");
                     }
                 }
                 catch (IOException iox)
                 {
-                    LogFileAction("Following exception occurred:", iox.Message);
+                    LogFileAction(dailyDestinationFolder, "Following exception occurred:", iox.Message);
                 }
             }
         }
@@ -153,7 +173,15 @@ namespace FileWatcherWorkerService
 
         private void LogFileAction(params string[] messages)
         {
-            using (StreamWriter writer = File.AppendText(_configuration["logfile"]))
+            string logsFolderPath = Path.Combine(_configuration["sourcepath"], "logs");
+            string logFilePath = Path.Combine(logsFolderPath, "logs.txt");
+
+            if (!Directory.Exists(logsFolderPath))
+            {
+                Directory.CreateDirectory(logsFolderPath);
+            }
+
+            using (StreamWriter writer = File.AppendText(logFilePath))
             {
                 foreach (var message in messages)
                 {
@@ -162,21 +190,17 @@ namespace FileWatcherWorkerService
             }
         }
 
-        private void OnDelete(object source, FileSystemEventArgs e)
 
+        private void OnDelete(object source, FileSystemEventArgs e)
         {
-            // DirectoryInfo dirSource = new DirectoryInfo(ConfigVar.sourcePath);
             DateTime now = DateTime.Now;
 
             using (StreamWriter writer = File.AppendText(_configuration["logfile"]))
             {
-                //writer.WriteLine($"the event is {e.Name} from {e.FullPath}");
-                //writer.WriteLine($"the source is {source.ToString}");
-                //writer.WriteLine($"The file {e.Name} has been deleted from {ConfigVar.sourcePath} at time {now.ToString("F")}");
                 writer.WriteLine($"{now.ToString("F")} {e.Name} deleted from {_configuration["sourcepath"]}");
             }
-
         }
+
         private void OnRenamed(object source, RenamedEventArgs e)
         {
             using (StreamWriter writer = new StreamWriter(_configuration["sourcepath"], true))
